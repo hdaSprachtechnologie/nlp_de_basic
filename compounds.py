@@ -1,3 +1,5 @@
+# Eine Methode zur Analyse deutscher Komposita
+
 import nouns
 from nouns import nouns
 import compounds_syllables
