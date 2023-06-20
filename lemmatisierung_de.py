@@ -1,10 +1,8 @@
-from morphy_mapping import find_lemma_dict
+import pandas as pd
 
 
-#textin = open('lemma_test.txt', 'r',encoding='utf-8')
-#out  = open('out.txt','w',encoding='utf-8')
-
-#lines = textin.readlines()
+df_lemma = pd.read_csv("morphy_mapping.tsv", sep="\t")
+lemma = df_lemma.set_index("word")["lemma"].to_dict()
 
 
 '''
@@ -27,9 +25,12 @@ def lemmatize_word(word):
         return(word)
     elif word.isupper():
         word = word.capitalize()
-        return find_lemma_dict(word)
+        if word in lemma.keys():
+            return(lemma[word])
+    elif word in lemma.keys():
+        return(lemma[word])
     else:
-        return find_lemma_dict(word)
+        return(word)
         
 
 
@@ -40,10 +41,4 @@ def lemmatize_sentence(sentence):
         sentence = sentence.replace(w,w_new)
     return(sentence)
 
-#print(lemmatize_sentence(testsatz))
 
-#for line in lines:
-#    out.write(lemmatize_sentence(line))
-
-#textin.close()
-#out.close()
