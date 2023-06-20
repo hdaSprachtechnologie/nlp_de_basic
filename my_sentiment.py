@@ -1,7 +1,13 @@
 import re
-from sentiment_words import sentiments
+#from sentiment_words import sentiments
 import spacy
-nlp = spacy.load('de')
+nlp = spacy.load('de_core_news_sm')
+import pandas as pd
+
+
+#df_sentiment = pd.read_csv("202306012_sentiment_wordlist.tsv", sep="\t")
+df_sentiment = pd.read_csv("sentiment_words.tsv", sep="\t")
+sentiments = df_sentiment.set_index("word")["sentiment"].to_dict()
 
 
 negations = ("NIE", 'nicht', 'nich', 'kein', 'keine', "Keine", "ohne", "nie", "nein", "keiner", "nichts", "weder", "Weder", 'garnicht',
@@ -20,7 +26,6 @@ def bmp(s):
     return "".join((i if ord(i) < 10000 else '\ufffd' for i in s))
 
 
-#blob = TextBlobDE(testsatz)
 
 sent_score = 0
 

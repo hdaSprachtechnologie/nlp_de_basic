@@ -4,6 +4,7 @@ import nouns
 from nouns import nouns
 import compounds_syllables
 from compounds_syllables import analyze_compound_syls
+import spacy
 
 # Hier wird zunächst nachgesehen, ob ein Wort in der aus der TIGER-Baumbank generierten Nomenliste
 # enthalten ist.
@@ -13,7 +14,7 @@ def lookup_noun(word):
         if word in item:
             return(True)
 
-compound_exceptions = ['Dänemark','Partei','Haushalten']
+compound_exceptions = ['Kombinationen','Operatoren','Ganzem','Dänemark','Partei','Haushalten','aufgrund','Aussagen','Kombination','Sachverhalten','Ausdrucks-','Ausdrucks','Ausdruck','kombinieren','Baum','Handlungen','auftritt']
 
 # Hier wird nach Nominalkomposita gesucht, die aus zwei Elementen bestehen.
 
@@ -97,7 +98,9 @@ def analyze_compound_3(word):
     return(components)
                    
 def analyze_compound(word):
-    if word in compound_exceptions:                       # nur wenn das Wort nicht in der Ausnahmeliste steht
+    if word.islower():                        # nur großgeschriebene Wörter im Deutschen können Nominalkomposita sein
+        components = [word]
+    elif word in compound_exceptions:                       # nur wenn das Wort nicht in der Ausnahmeliste steht
         components = [word]
     elif len(word)< 3:                                                         # nur wenn das Wort mindestens aus 6 Buchstaben besteht
         components = [word]
@@ -106,14 +109,35 @@ def analyze_compound(word):
     else:
         components = analyze_compound_syls(word)
 #        print("COMPONENTS SYLS: " + str(components))
-    if len(components) < 2 and word not in compound_exceptions:  
+    if len(components) < 2 and word not in compound_exceptions and not word.islower():  
         components = analyze_compound_2(word)
 #        print("COMPONENT_2: "  + str(components))
-    if len(components) < 2 and word not in compound_exceptions:
+    if len(components) < 2 and word not in compound_exceptions and not word.islower():
         components = analyze_compound_3(word)
     else:
         return(components)
     return(components)
+
+# all_compounds_from_a_text(r"C:\Users\Melanie Siegel\Documents\01_Lehre_Darmstadt\00_Semantik_II\Semantik_mit_ChatGPT.txt")
+
+def all_compounds_from_a_text(textfile):
+    nlp = spacy.load("de_core_news_sm")
+    text = open(textfile,'r',errors='ignore')
+    lines = text.readlines()
+    compound_list = []
+    for line in lines:
+        doc = nlp(line)
+        for token in doc:
+            if token.text not in compound_list:
+                components = analyze_compound(token.text)
+                if len(components) > 1:
+                    compound_list.append(token.text)
+                    print(token.text)
+    text.close()
+    return(compound_list)
+
+
+    
 
 def test_compounds():
     print("Sofabett " + str(analyze_compound("Sofabett")))
